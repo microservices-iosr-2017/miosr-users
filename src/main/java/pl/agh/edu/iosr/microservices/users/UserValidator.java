@@ -1,22 +1,28 @@
 package pl.agh.edu.iosr.microservices.users;
 
 import com.mongodb.*;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.core.env.Environment;
 
 @Component
 public class UserValidator {
 
-    @Autowired
     private Environment environment;
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     private final MongoClient mongoClient;
     private final MongoDatabase db;
 
 
-    public UserValidator() {
+    public UserValidator(Environment environment) {
+        this.environment = environment;
         String databaseHost = environment.getProperty("spring.data.mongodb.host");
         String databasePort = environment.getProperty("spring.data.mongodb.port");
         mongoClient = new MongoClient(databaseHost, Integer.parseInt(databasePort));
@@ -26,21 +32,12 @@ public class UserValidator {
     public boolean isAValidUser(User user) {
         System.out.println("Yes, its valid");
         String databaseCollection = environment.getProperty("spring.data.mongodb.database");
-        DBCollection table = (DBCollection) db.getCollection(databaseCollection);
+        MongoCollection<Document> collection = db.getCollection(databaseCollection);
+        
         BasicDBObject searchQuery = new BasicDBObject();
         searchQuery.put("username", user.getUsername());
         searchQuery.put("password", user.getPassword());
-        DBCursor cursor = table.find(searchQuery);
-
-        if (!cursor.hasNext()) {
-            System.out.println("No users found");
-        } else {
-            while (cursor.hasNext()) {
-                System.out.println(cursor.next());
-            }
-        }
-
-
-        return true;
+        Document document = collection.find(searchQuery).first();
+        return document != null;
     }
 }
