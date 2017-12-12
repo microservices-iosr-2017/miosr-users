@@ -9,18 +9,19 @@ import javax.servlet.http.HttpServletResponse;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
-@RequestMapping("/login")
 public class UsersController {
 
     @Autowired
     private UserValidator validator;
 
     @Autowired
+    private UserRegistrator registrator;
+
+    @Autowired
     private JWTTokenGenerator generator;
 
-    @RequestMapping(method = POST)
+    @RequestMapping(method = POST, value="/login")
     @ResponseBody
-//    @ResponseStatus(HttpStatus.FORBIDDEN)
     public String login(@RequestBody User user) {
         System.out.println("HEEEEEEEEEEEEEELO from " + user.getUsername() + " " + user.getPassword());
         if (validator.isAValidUser(user)) {
@@ -29,5 +30,12 @@ public class UsersController {
             return token;
         }
         return String.valueOf(HttpServletResponse.SC_FORBIDDEN);
+    }
+
+    @RequestMapping(method = POST, value = "/register")
+    public void register(@RequestBody User newUser) {
+        System.out.println("Hello from new user");
+        registrator.registerUser(newUser);
+
     }
 }

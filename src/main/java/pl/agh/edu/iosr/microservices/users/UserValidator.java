@@ -19,23 +19,17 @@ import java.io.UnsupportedEncodingException;
 public class UserValidator {
 
     private Environment environment;
+    private MongoDatabase database;
 
-    private final MongoClient mongoClient;
-    private final MongoDatabase db;
-
-
-    public UserValidator(Environment environment) {
+    public UserValidator(DatabaseUtils utils, Environment environment) {
         this.environment = environment;
-        String databaseHost = environment.getProperty("spring.data.mongodb.host");
-        String databasePort = environment.getProperty("spring.data.mongodb.port");
-        mongoClient = new MongoClient(databaseHost, Integer.parseInt(databasePort));
-        db = mongoClient.getDatabase("users");
+        database = utils.initialize();
     }
 
     public boolean isAValidUser(User user) {
-        System.out.println("Yes, its valid");
-        String databaseCollection = environment.getProperty("spring.data.mongodb.database");
-        MongoCollection<Document> collection = db.getCollection(databaseCollection);
+        System.out.println("Starting validating");
+        String collectionName = environment.getProperty("spring.data.mongodb.collection");
+        MongoCollection<Document> collection = database.getCollection(collectionName);
 
         BasicDBObject searchQuery = new BasicDBObject();
         searchQuery.put("username", user.getUsername());
