@@ -1,9 +1,10 @@
 package pl.agh.edu.iosr.microservices.users;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static org.springframework.web.bind.annotation.RequestMethod.*;
@@ -22,14 +23,16 @@ public class UsersController {
 
     @RequestMapping(method = POST, value="/login")
     @ResponseBody
-    public String login(@RequestBody User user) {
+    public ResponseEntity<Object> login(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
         System.out.println("HEEEEEEEEEEEEEELO from " + user.getUsername() + " " + user.getPassword());
         if (validator.isAValidUser(user)) {
             String token = generator.generate(user);
             validator.checkToken(token, user);
-            return token;
+            response.setHeader("token", token);
+            System.out.println("New2");
+            return ResponseEntity.status(HttpServletResponse.SC_ACCEPTED).body(null);
         }
-        return String.valueOf(HttpServletResponse.SC_FORBIDDEN);
+        return ResponseEntity.status(HttpServletResponse.SC_FORBIDDEN).body(null);
     }
 
     @RequestMapping(method = POST, value = "/register")
