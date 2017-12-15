@@ -1,7 +1,25 @@
+
 language: java
+
 sudo: false
-script: mvn clean verify package
+
+
+services:
+  - docker
+
+
 notifications:
-  email:
-    on_success: never
-    on_failure: always
+  slack:
+    iosr-workgroup:8wdjZUlR1MD3XQN16znNltRq#miosr_crud
+
+
+script:
+  mvn clean validate package
+
+
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+      docker build -t wzagrajcz/miosr-users -f Dockerfile .;
+      docker login -u "$DOCKER_USERNAME_WZ" -p "$DOCKER_PASSWORD_WZ";
+      docker push wzagrajcz/miosr-users;
+    fi

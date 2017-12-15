@@ -2,13 +2,16 @@ version: "3"
 
 services:
   web:
-    build: .
+    image: wzagrajcz/miosr-users
     ports:
       - "8080:8080"
     links:
       - mongo
     depends_on:
       - mongo
+    labels:
+      kompose.service.expose: "true"
+
   mongo:
     image: mongo
     ports:

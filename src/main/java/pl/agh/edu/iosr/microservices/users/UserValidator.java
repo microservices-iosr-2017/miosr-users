@@ -8,8 +8,6 @@ import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.core.env.Environment;
 
@@ -39,7 +37,7 @@ public class UserValidator {
     }
 
 
-    public void checkToken(String token, User user) {
+    public boolean checkToken(String token, User user) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(environment.getProperty("validator.secretkey"));
             JWTVerifier verifier = JWT.require(algorithm)
@@ -47,10 +45,11 @@ public class UserValidator {
                     .build();
 
             DecodedJWT jwt = verifier.verify(token);
-            System.out.println(jwt.getIssuer());
+            return jwt.getIssuer().equals(user.username);
 
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+        return false;
     }
 }
