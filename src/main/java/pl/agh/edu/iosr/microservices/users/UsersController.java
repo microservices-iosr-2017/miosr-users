@@ -21,7 +21,7 @@ public class UsersController {
     @Autowired
     private JWTTokenGenerator generator;
 
-    @RequestMapping(method = POST, value="/login")
+    @RequestMapping(method = POST, value="/auth/login")
     @ResponseBody
     public ResponseEntity<Object> login(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
         System.out.println("HEEEEEEEEEEEEEELO from " + user.getUsername() + " " + user.getPassword());
@@ -35,7 +35,7 @@ public class UsersController {
         return ResponseEntity.status(HttpServletResponse.SC_FORBIDDEN).body(null);
     }
 
-    @RequestMapping(method = POST, value = "/register")
+    @RequestMapping(method = POST, value = "/auth/register")
     public void register(@RequestBody User newUser) {
         System.out.println("Hello from new user");
         registrator.registerUser(newUser);
